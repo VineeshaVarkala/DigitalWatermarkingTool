@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Watermarking Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <div class="logo">DW</div>
+            <h1>Digital Watermarking Tool</h1>
+            <p>Protect your images with a custom text watermark.</p>
+        </header>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="image">Choose your image</label>
+            <input type="file" id="image" name="image"
+                   accept=".png,.jpg,.jpeg,.webp" required>
+
+            <label for="watermark">Watermark text</label>
+            <input type="text" id="watermark" name="watermark"
+                   placeholder="© Your Name" maxlength="100" required>
+
+            <label for="position">Watermark position</label>
+            <select id="position" name="position">
+                <option value="bottom-right">Bottom right</option>
+                <option value="bottom-left">Bottom left</option>
+                <option value="top-right">Top right</option>
+                <option value="top-left">Top left</option>
+                <option value="center">Center</option>
+            </select>
+
+            <label for="opacity">Watermark opacity</label>
+            <select id="opacity" name="opacity">
+                <option value="80">Light</option>
+                <option value="150" selected>Medium</option>
+                <option value="230">Strong</option>
+                <option value="255">Fully opaque</option>
+            </select>
+
+            <button type="submit">Add Watermark &amp; Download</button>
+        </form>
+
+        <p class="note">
+            Your image is processed in this app and the result is downloaded
+            as a PNG. Choose a copy of your original image to keep it unchanged.
+        </p>
+    </main>
+</body>
+</html>

@@ -1,5 +1,11 @@
+
 pipeline {
     agent any
+
+    environment {
+        IMAGE_NAME = 'viineesha1263/digital-watermarking-tool'
+        IMAGE_TAG = 'v1'
+    }
 
     stages {
         stage('Checkout') {
@@ -11,23 +17,40 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t digital-watermarking-tool:v1 .'
+                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
             }
         }
 
-        stage('Verify Docker Image') {
+        stage('Login and Push to Docker Hub') {
             steps {
-                bat 'docker images digital-watermarking-tool'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_TOKEN'
+                    )
+                ]) {
+                    bat '''
+                        @echo off
+                        echo %DOCKER_TOKEN% | docker login -u "%DOCKER_USER%" --password-stdin
+                        if errorlevel 1 exit /b 1
+
+                        docker push %IMAGE_NAME%:%IMAGE_TAG%
+                        if errorlevel 1 exit /b 1
+
+                        docker logout
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Digital Watermarking Tool pipeline completed successfully!'
+            echo 'Digital Watermarking Tool image published successfully!'
         }
         failure {
-            echo 'Pipeline failed. Check the Console Output for details.'
+            echo 'Pipeline failed. Check Console Output for details.'
         }
     }
 }
